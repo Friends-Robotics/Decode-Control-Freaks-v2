@@ -15,8 +15,6 @@ import java.util.Locale;
 
 @TeleOp(name = "Test: AprilTag Detection Test", group = "Test")
 public class CV extends LinearOpMode {
-
-    private static final boolean USE_WEBCAM = true;
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     private Servo servo;
@@ -56,13 +54,8 @@ public class CV extends LinearOpMode {
 
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
 
-        if (USE_WEBCAM) {
-            visionPortal = VisionPortal.easyCreateWithDefaults(
-                    hardwareMap.get(WebcamName.class, "Webcam"), aprilTag);
-        } else {
-            visionPortal = VisionPortal.easyCreateWithDefaults(
-                    BuiltinCameraDirection.BACK, aprilTag);
-        }
+        visionPortal = VisionPortal.easyCreateWithDefaults(
+                hardwareMap.get(WebcamName.class, "Webcam"), aprilTag);
 
         servo = hardwareMap.get(Servo.class, "Servo");
         servo.setDirection(Servo.Direction.FORWARD);

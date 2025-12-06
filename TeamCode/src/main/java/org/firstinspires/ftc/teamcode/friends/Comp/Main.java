@@ -2,26 +2,20 @@ package org.firstinspires.ftc.teamcode.friends.Comp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-@TeleOp(name = "Driving")
+import org.firstinspires.ftc.teamcode.friends.HardwareMap;
+
+// Abstract into methods
+
+@TeleOp(name = "Comp")
 public class Main extends LinearOpMode {
     private static double speedModifier = 0.8;
     private static float intakePower = -0.8f;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("FLM");
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("BLM");
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("FRM");
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("BRM");
-
-        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        DcMotor intakeMotor = hardwareMap.dcMotor.get("Motor");
+        HardwareMap hwMap = new HardwareMap(hardwareMap);
 
         waitForStart();
 
@@ -53,10 +47,10 @@ public class Main extends LinearOpMode {
             double frontRightPower = (y - x - rx) / denominator;
             double backRightPower = (y + x - rx) / denominator;
 
-            frontLeftMotor.setPower(frontLeftPower * speedModifier);
-            backLeftMotor.setPower(backLeftPower * speedModifier);
-            frontRightMotor.setPower(frontRightPower * speedModifier);
-            backRightMotor.setPower(backRightPower * speedModifier);
+            hwMap.frontLeftMotor.setPower(frontLeftPower * speedModifier);
+            hwMap.backLeftMotor.setPower(backLeftPower * speedModifier);
+            hwMap.frontRightMotor.setPower(frontRightPower * speedModifier);
+            hwMap.backRightMotor.setPower(backRightPower * speedModifier);
 
             /// Intake
 
@@ -72,9 +66,9 @@ public class Main extends LinearOpMode {
             }
 
             if (gamepad1.x) {
-                intakeMotor.setPower(intakePower);
+                hwMap.intakeMotor.setPower(intakePower);
             } else {
-                intakeMotor.setPower(0);
+                hwMap.intakeMotor.setPower(0);
             }
 
             telemetry.addData("Robot Speed: ", speedModifier);
