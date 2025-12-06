@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class HardwareMap {
 
+    // Add April tag objects to HardwareMap
+
     /*
         -----------------------------------------------------------------------
         | FRM               | Front Right Wheel     | Control Hub Motor 0     |

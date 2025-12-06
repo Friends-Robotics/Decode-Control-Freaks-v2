@@ -16,16 +16,8 @@ import java.util.Locale;
 @TeleOp(name = "Test: AprilTag Detection Test", group = "Test")
 public class CV extends LinearOpMode {
 
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
-
-    /**
-     * The variable to store our instance of the AprilTag processor.
-     */
+    private static final boolean USE_WEBCAM = true;
     private AprilTagProcessor aprilTag;
-
-    /**
-     * The variable to store our instance of the vision portal.
-     */
     private VisionPortal visionPortal;
     private Servo servo;
     final double outerServoChange = 0.005;
@@ -36,10 +28,6 @@ public class CV extends LinearOpMode {
     public void runOpMode() {
 
         initAprilTag();
-
-        // Wait for the DS start button to be touched.
-        telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
-        telemetry.addData(">", "Touch START to start OpMode");
         telemetry.update();
         waitForStart();
 
@@ -48,7 +36,6 @@ public class CV extends LinearOpMode {
 
                 processCameraOutput();
 
-                // Push telemetry to the Driver Station.
                 telemetry.update();
 
                 // Save CPU resources; can resume streaming when needed.
@@ -62,32 +49,25 @@ public class CV extends LinearOpMode {
                 sleep(20);
             }
         }
-
         // Save more CPU resources when camera is no longer needed.
         visionPortal.close();
-
     }
-
-    /**
-     * Initialize the AprilTag processor.
-     */
     private void initAprilTag() {
 
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
 
         if (USE_WEBCAM) {
             visionPortal = VisionPortal.easyCreateWithDefaults(
-                    hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag);
+                    hardwareMap.get(WebcamName.class, "Webcam"), aprilTag);
         } else {
             visionPortal = VisionPortal.easyCreateWithDefaults(
                     BuiltinCameraDirection.BACK, aprilTag);
         }
 
-        servo = hardwareMap.get(Servo.class, "servo");
+        servo = hardwareMap.get(Servo.class, "Servo");
         servo.setDirection(Servo.Direction.FORWARD);
         servo.setPosition(0.5);
     }
-
     private void processCameraOutput() {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         telemetry.addData("# AprilTags Detected", currentDetections.size());
@@ -99,12 +79,12 @@ public class CV extends LinearOpMode {
 
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata == null) continue;
-            if(detection.id == 21) processAprilTag(detection);
+            if(detection.id == 20 || detection.id == 24) // 2 Basket aprilTag id's
+                processAprilTag(detection);
         }
 
         telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
     }
-
     private void processAprilTag(AprilTagDetection detection){
         telemetry.addLine(String.format(Locale.ENGLISH ,"\n==== (ID %d) %s", detection.id, detection.metadata.name));
         telemetry.addLine(String.format(Locale.ENGLISH ,"XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
@@ -118,7 +98,6 @@ public class CV extends LinearOpMode {
             telemetry.addLine("TURNING RIGHT");
         }
     }
-
     private void lookForAprilTags(){
         telemetry.addLine("LOOKING FOR APRILTAGS");
 
