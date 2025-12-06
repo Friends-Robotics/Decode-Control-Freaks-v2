@@ -6,11 +6,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-
 @TeleOp(name = "Driving")
 public class Main extends LinearOpMode {
     private static double speedModifier = 0.8;
-    private static float power = -0.8f;
+    private static float intakePower = -0.8f;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -22,7 +21,7 @@ public class Main extends LinearOpMode {
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        DcMotor motor = hardwareMap.dcMotor.get("Motor");
+        DcMotor intakeMotor = hardwareMap.dcMotor.get("Motor");
 
         waitForStart();
 
@@ -35,10 +34,9 @@ public class Main extends LinearOpMode {
 
             /// Driving
 
-            if(gamepad1.touchpad && speedModifier == 0.8){
+            if (gamepad1.touchpad && speedModifier == 0.8) {
                 speedModifier = 1.0;
-            }
-            else if(gamepad1.touchpad && speedModifier == 1.0){
+            } else if (gamepad1.touchpad && speedModifier == 1.0) {
                 speedModifier = 0.8;
             }
 
@@ -65,24 +63,22 @@ public class Main extends LinearOpMode {
             previousGamepad1.copy(currentGamepad1);
             currentGamepad1.copy(gamepad1);
 
-            boolean intakeTriggered = false;
-            if(gamepad1.x) { // toggle so u don't have to hold
-                motor.setPower(power);
-            } else {
-                motor.setPower(0);
-            }
-
             if (currentGamepad1.right_trigger == 1 && !(previousGamepad1.right_trigger == 1)) {
-                power += 1f;
-            }
-            if (currentGamepad1.left_trigger == 1 && !(previousGamepad1.left_trigger == 1)){
-                power -= 1f;
+                intakePower = 0.8f;
             }
 
-            power = Math.min(1.0f, power);
-            power = Math.max(-1.0f, power);
+            if (currentGamepad1.left_trigger == 1 && !(previousGamepad1.left_trigger == 1)) {
+                intakePower = -0.8f;
+            }
 
-            telemetry.addData("Power: ", power);
+            if (gamepad1.x) {
+                intakeMotor.setPower(intakePower);
+            } else {
+                intakeMotor.setPower(0);
+            }
+
+            telemetry.addData("Robot Speed: ", speedModifier);
+            telemetry.addData("Intake Motor Speed: ", intakePower);
             telemetry.update();
         }
     }
