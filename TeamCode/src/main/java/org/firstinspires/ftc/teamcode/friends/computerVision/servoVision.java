@@ -14,7 +14,7 @@ import java.util.Locale;
 
 // Vision based on a servo attached to the webcam which turns
 
-@TeleOp(name = "Test: AprilTag Detection Test", group = "Test")
+@TeleOp(name = "Vision Test")
 public class servoVision extends LinearOpMode {
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;

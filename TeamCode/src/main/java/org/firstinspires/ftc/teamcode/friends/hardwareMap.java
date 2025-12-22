@@ -2,17 +2,20 @@ package org.firstinspires.ftc.teamcode.friends;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 /**
  * Class to provide a helpful abstraction layer for accessing the HardwareMap
  */
 
-public class HardwareMap {
+public class hardwareMap {
 
     // Add April tag objects to HardwareMap
+    // Add shooterTest motor
 
     /*
+        -----------------------------------------------------------------------
+        | Driver Station    | Name                  | Control HUB Location    |
         -----------------------------------------------------------------------
         | FRM               | Front Right Wheel     | Control Hub Motor 0     |
         --------------------+-----------------------+--------------------------
@@ -43,7 +46,7 @@ public class HardwareMap {
     //public DcMotor shooterMotor2;
     //public Servo turretServo;
 
-    public HardwareMap(com.qualcomm.robotcore.hardware.HardwareMap hardwaremap) {
+    public hardwareMap(HardwareMap hardwaremap) {
 
         frontRightMotor = hardwaremap.get(DcMotor.class, "FRM");
         frontRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);

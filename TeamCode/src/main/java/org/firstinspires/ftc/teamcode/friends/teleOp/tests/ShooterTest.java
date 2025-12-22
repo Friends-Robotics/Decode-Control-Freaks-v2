@@ -6,11 +6,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
-// Tidy up when it works
+// Add a motor to spin the turret around
 
 @TeleOp(name =  "Shooter Test")
 public class ShooterTest extends LinearOpMode {
     private static float power = 0.0f;
+    private static float servoPosition = 0.0f;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -36,8 +37,8 @@ public class ShooterTest extends LinearOpMode {
                 motor1.setPower(power);
                 motor2.setPower(power);
             } else {
-                motor1.setPower(0);
-                motor2.setPower(0);
+                motor1.setPower(0.0f);
+                motor2.setPower(0.0f);
             }
 
             if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up) {
@@ -51,18 +52,18 @@ public class ShooterTest extends LinearOpMode {
             power = Math.max(-1.0f, power);
 
             /// Shooter Angle
-            double servoPosition = 0;
 
             if(gamepad1.left_bumper && gamepad1.right_bumper)
                 servo.setPosition(servoPosition);
 
-            if(gamepad1.right_trigger == 1)
-                servoPosition += 0.25;
-            else if(gamepad1.left_trigger == 1)
-                servoPosition -= 0.25;
 
-            servoPosition = Math.min(1.0, servoPosition);
-            servoPosition = Math.max(0, servoPosition);
+            if(currentGamepad1.right_trigger == 1.0f && !(previousGamepad1.right_trigger == 1.0f))
+                servoPosition += 0.05f;
+            else if(currentGamepad1.left_trigger == 1.0f && !(previousGamepad1.left_trigger == 1.0f))
+                servoPosition -= 0.05f;
+
+            servoPosition = Math.min(1.0f, servoPosition);
+            servoPosition = Math.max(0f, servoPosition);
 
             telemetry.addData("Power: ", power);
             telemetry.addData("Angle: ", servoPosition);
