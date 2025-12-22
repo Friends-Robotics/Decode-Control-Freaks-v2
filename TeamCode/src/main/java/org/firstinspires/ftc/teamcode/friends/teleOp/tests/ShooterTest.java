@@ -17,6 +17,7 @@ public class ShooterTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         DcMotor motor1 = hardwareMap.dcMotor.get("Motor1");
         DcMotor motor2 = hardwareMap.dcMotor.get("Motor2");
+        DcMotor turretMotor = hardwareMap.dcMotor.get("turretMotor");
 
         Servo servo = hardwareMap.servo.get("Servo");
         servo.setDirection(Servo.Direction.FORWARD);
@@ -36,9 +37,11 @@ public class ShooterTest extends LinearOpMode {
             if(gamepad1.touchpad) {
                 motor1.setPower(power);
                 motor2.setPower(power);
+                turretMotor.setPower(power);
             } else {
                 motor1.setPower(0.0f);
                 motor2.setPower(0.0f);
+                turretMotor.setPower(0.0f);
             }
 
             if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up) {
@@ -55,7 +58,6 @@ public class ShooterTest extends LinearOpMode {
 
             if(gamepad1.left_bumper && gamepad1.right_bumper)
                 servo.setPosition(servoPosition);
-
 
             if(currentGamepad1.right_trigger == 1.0f && !(previousGamepad1.right_trigger == 1.0f))
                 servoPosition += 0.05f;

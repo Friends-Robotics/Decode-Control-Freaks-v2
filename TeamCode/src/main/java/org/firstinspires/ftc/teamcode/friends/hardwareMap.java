@@ -31,7 +31,9 @@ public class hardwareMap {
         -----------------------------------------------------------------------
         | Shooter2          | Shooter Motor 2       | Expansion Hub Motor 2   |
         -----------------------------------------------------------------------
-        | Turret            | Turret Servo          | Control Hub Servo 0     |
+        | TurretMotor       | Turret Motor          | Expansion Hub Motor 3   |
+        -----------------------------------------------------------------------
+        | TurretServo       | Turret Servo          | Control Hub Servo 0     |
         -----------------------------------------------------------------------
      */
 
@@ -61,6 +63,7 @@ public class hardwareMap {
 
         //shooterMotor1 = hardwaremap.get(DcMotor.class, "Shooter1");
         //shooterMotor2 = hardwaremap.get(DcMotor.class, "Shooter2");
-        //turretServo = hardwaremap.get(Servo.class, "Turret");
+        //turretMotor = hardwaremap.get(DcMotor.class, "TurretMotor");
+        //turretServo = hardwaremap.get(Servo.class, "TurretServo");
     }
 }
