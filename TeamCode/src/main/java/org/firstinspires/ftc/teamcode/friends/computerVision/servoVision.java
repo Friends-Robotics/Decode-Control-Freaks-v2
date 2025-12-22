@@ -1,10 +1,9 @@
-package org.firstinspires.ftc.teamcode.friends.computerVision.tests;
+package org.firstinspires.ftc.teamcode.friends.computerVision;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -13,8 +12,10 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.Locale;
 
+// Vision based on a servo attached to the webcam which turns
+
 @TeleOp(name = "Test: AprilTag Detection Test", group = "Test")
-public class CV extends LinearOpMode {
+public class servoVision extends LinearOpMode {
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     private Servo servo;
