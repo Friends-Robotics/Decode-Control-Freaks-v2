@@ -5,12 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
-
-// Add a motor to spin the turret around
-
-@TeleOp(name =  "Shooter Test")
+@TeleOp(name = "Shooter Test")
 public class ShooterTest extends LinearOpMode {
-    private static float power = 0.0f;
+    private static float shooterPower = 0.0f;
+    private static float turretPower = 0.0f;
     private static float servoPosition = 0.0f;
 
     @Override
@@ -35,39 +33,49 @@ public class ShooterTest extends LinearOpMode {
 
             /// Shooting
             if(gamepad1.touchpad) {
-                motor1.setPower(power);
-                motor2.setPower(power);
-                turretMotor.setPower(power);
+                motor1.setPower(shooterPower);
+                motor2.setPower(shooterPower);
             } else {
                 motor1.setPower(0.0f);
                 motor2.setPower(0.0f);
-                turretMotor.setPower(0.0f);
             }
 
             if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up) {
-                power += 0.1f;
+                shooterPower += 0.1f;
             }
             if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down){
-                power -= 0.1f;
+                shooterPower -= 0.1f;
             }
 
-            power = Math.min(1.0f, power);
-            power = Math.max(-1.0f, power);
+            shooterPower = Math.min(1.0f, shooterPower);
+            shooterPower = Math.max(-1.0f, shooterPower);
 
             /// Shooter Angle
 
-            if(gamepad1.left_bumper && gamepad1.right_bumper)
+            if(currentGamepad1.left_trigger == 1.0 && currentGamepad1.right_trigger == 1.0)
                 servo.setPosition(servoPosition);
 
-            if(currentGamepad1.right_trigger == 1.0f && !(previousGamepad1.right_trigger == 1.0f))
+            if(currentGamepad1.triangle && !(previousGamepad1.triangle))
                 servoPosition += 0.05f;
-            else if(currentGamepad1.left_trigger == 1.0f && !(previousGamepad1.left_trigger == 1.0f))
+            else if(currentGamepad1.cross && !(previousGamepad1.cross))
                 servoPosition -= 0.05f;
 
             servoPosition = Math.min(1.0f, servoPosition);
             servoPosition = Math.max(0f, servoPosition);
 
-            telemetry.addData("Power: ", power);
+            /// Turret Movement
+
+            turretMotor.setPower(turretPower);
+
+            if(currentGamepad1.left_bumper && !(previousGamepad1.left_bumper))
+                turretPower -= 0.1f;
+            if(currentGamepad1.right_bumper && !(previousGamepad1.right_bumper))
+                turretPower += 0.1f;
+
+            turretPower = Math.min(1.0f, turretPower);
+            turretPower = Math.max(0.0f, turretPower);
+
+            telemetry.addData("Power: ", shooterPower);
             telemetry.addData("Angle: ", servoPosition);
             telemetry.update();
         }

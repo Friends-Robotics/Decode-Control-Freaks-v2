@@ -4,10 +4,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-/**
- * Class to provide a helpful abstraction layer for accessing the HardwareMap
- */
-
 public class hardwareMap {
 
     // Add April tag objects to HardwareMap

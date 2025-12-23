@@ -1,10 +1,14 @@
 package org.firstinspires.ftc.teamcode.friends.computerVision;
 
+import android.util.Size;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -53,10 +57,17 @@ public class servoVision extends LinearOpMode {
     }
     private void initAprilTag() {
 
-        aprilTag = AprilTagProcessor.easyCreateWithDefaults();
+        aprilTag = new AprilTagProcessor.Builder()
+                .setOutputUnits(DistanceUnit.CM, AngleUnit.DEGREES)
+                .setLensIntrinsics(435.14, 436.58, 323.26, 162.08)
+                .build();
 
-        visionPortal = VisionPortal.easyCreateWithDefaults(
-                hardwareMap.get(WebcamName.class, "Webcam"), aprilTag);
+        visionPortal = new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam"))
+                .setCameraResolution(new Size(1920, 1080))
+                .addProcessor(aprilTag)
+                .build();
+
 
         servo = hardwareMap.get(Servo.class, "Servo");
         servo.setDirection(Servo.Direction.FORWARD);
