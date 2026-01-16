@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.friends.hardwareMap;
 // Abstract into methods
 
 @TeleOp(name = "Comp")
-public class Main extends LinearOpMode {
+public class OneController extends LinearOpMode {
     private static double speedModifier = 0.8;
     private static float intakePower = -0.8f;
 

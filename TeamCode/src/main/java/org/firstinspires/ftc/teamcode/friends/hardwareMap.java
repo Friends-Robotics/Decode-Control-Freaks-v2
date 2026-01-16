@@ -3,10 +3,11 @@ package org.firstinspires.ftc.teamcode.friends;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class hardwareMap {
 
-    // Add April tag objects to HardwareMap
+    // Add April tag objects to HardwareMap (Limelight)
     // Add shooterTest motor
 
     /*
@@ -31,6 +32,11 @@ public class hardwareMap {
         -----------------------------------------------------------------------
         | TurretServo       | Turret Servo          | Control Hub Servo 0     |
         -----------------------------------------------------------------------
+
+        1. Shooter motor go opposite direction
+        2. One servo changes angle
+        3. 0.7 close, 0.9 far
+
      */
 
     public DcMotor frontLeftMotor;
@@ -40,9 +46,10 @@ public class hardwareMap {
 
     public DcMotor intakeMotor;
 
-    //public DcMotor shooterMotor1;
-    //public DcMotor shooterMotor2;
-    //public Servo turretServo;
+    public DcMotor shooterMotor1;
+    public DcMotor shooterMotor2;
+    public DcMotor turretMotor;
+    public Servo turretServo;
 
     public hardwareMap(HardwareMap hardwaremap) {
 
@@ -55,11 +62,11 @@ public class hardwareMap {
         backLeftMotor = hardwaremap.get(DcMotor.class, "BLM");
         backLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        intakeMotor = hardwaremap.get(DcMotor.class, "Intake");
+        intakeMotor = hardwaremap.get(DcMotor.class, "intake");
 
-        //shooterMotor1 = hardwaremap.get(DcMotor.class, "Shooter1");
-        //shooterMotor2 = hardwaremap.get(DcMotor.class, "Shooter2");
-        //turretMotor = hardwaremap.get(DcMotor.class, "TurretMotor");
-        //turretServo = hardwaremap.get(Servo.class, "TurretServo");
+        shooterMotor1 = hardwaremap.get(DcMotor.class, "shooter1");
+        shooterMotor2 = hardwaremap.get(DcMotor.class, "shooter2");
+        turretMotor = hardwaremap.get(DcMotor.class, "turretMotor");
+        turretServo = hardwaremap.get(Servo.class, "turretServo");
     }
 }

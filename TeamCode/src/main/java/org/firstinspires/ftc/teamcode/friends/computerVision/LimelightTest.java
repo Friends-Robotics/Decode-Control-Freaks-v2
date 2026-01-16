@@ -5,8 +5,6 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-
 @TeleOp
 public class LimelightTest extends LinearOpMode {
 
@@ -15,12 +13,9 @@ public class LimelightTest extends LinearOpMode {
     @Override
     public void runOpMode(){
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-
-        telemetry.setMsTransmissionInterval(11);
-
-        limelight.pipelineSwitch(0);
-
+        limelight.setPollRateHz(100);
         limelight.start();
+        limelight.pipelineSwitch(0);
 
         waitForStart();
 
@@ -29,11 +24,17 @@ public class LimelightTest extends LinearOpMode {
         while (opModeIsActive()){
             LLResult result = limelight.getLatestResult();
             if(result != null && result.isValid()) {
-                Pose3D botpose = result.getBotpose();
-                telemetry.addData("tx", result.getTx());
-                telemetry.addData("ty", result.getTy());
-                telemetry.addData("Botpose", botpose.toString());
+                double tx = result.getTx();
+                double ty = result.getTy();
+                double ta = result.getTa();
+
+                telemetry.addData("Target X", tx);
+                telemetry.addData("Target Y", ty);
+                telemetry.addData("Target Area", ta);
+            } else {
+                telemetry.addLine("No valid limelight data");
             }
+            telemetry.update();
         }
     }
 }
