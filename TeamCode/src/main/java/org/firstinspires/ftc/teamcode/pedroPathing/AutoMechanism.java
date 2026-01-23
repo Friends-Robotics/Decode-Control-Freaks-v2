@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+﻿package org.firstinspires.ftc.teamcode.pedroPathing;
 
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.Pose;
@@ -18,80 +18,108 @@ import org.firstinspires.ftc.teamcode.friends.HardwareMap;
 @Autonomous(name = "Pedro Multi-Ball")
 public class AutoMechanism extends LinearOpMode {
 
-    // ===== Robot Systems =====
-    HardwareMap robot;
-    Follower follower;
+    HardwareMap robot; // Uses the Hardware map in teleOp
+    Follower follower; // a Pedropathing thing that allows the robot to "follow" the paths
 
-    // ===== State Machine =====
-    enum AutoState {
+    enum AutoState { //Fun stuff
+        PRELOAD_SPIN_UP,
+        PRELOAD_FEED,
         DRIVE_TO_INTAKE,
         DRIVE_TO_SHOOT,
         SPIN_UP_SHOOTER,
         FEED_BALL,
         DONE
     }
-    AutoState currentState = AutoState.DRIVE_TO_INTAKE;
 
-    // ===== Timing & Counters =====
-    ElapsedTime stateTimer = new ElapsedTime();
-    int ballsShot = 0;
+    AutoState currentState = AutoState.PRELOAD_SPIN_UP; // Makes sure the first state is the first state
 
-    // ===== Shooter Constants =====
+    ElapsedTime stateTimer = new ElapsedTime(); // Controls the feeder duration without using sleep()
+
     static final double TARGET_RPM = 3200;
     static final double RPM_TOLERANCE = 100;
-    static final double FEED_TIME = 0.4; // seconds per ball
+    static final double FEED_TIME = 0.4;
+
+    static final int MAX_CYCLES = 3; // Does runs through the state machine 3 times
+    int cycleIndex = 0; // This checks through the intakeposes array
+    int ballsShot = 0;
+
+    Pose startPose = new Pose(48, 95, 0);
+    Pose shootPose = new Pose(48, 12, Math.toRadians(90));
+
+    Pose[] intakePoses = { // Cycle index cycles through these poses
+            new Pose(24, 0, 0),
+            new Pose(12, 0, 0),
+            new Pose(0, 0, 0)
+    };
+
+    PathChain intakePath; // Paths are built on the fly and change every cycle
+    PathChain shootPath;
 
     @Override
     public void runOpMode() {
 
-        // ===== INIT =====
-        robot = new HardwareMap(hardwareMap);
-        follower = Constants.createFollower(hardwareMap);
-
-        // ===== POSES =====
-        Pose startPose  = new Pose(0.0, 0.0, 0.0);
-        Pose intakeEnd  = new Pose(24.0, 0.0, 0.0); // drive straight line while intaking
-        Pose shootPose  = new Pose(48.0, 12.0, Math.toRadians(90));
-
+        robot = new HardwareMap(hardwareMap); // Starts robot hardware
+        follower = Constants.createFollower(hardwareMap); // Creates pedro follower
         follower.setPose(startPose);
-
-        // ===== PATHS =====
-        PathChain intakePath = new PathBuilder(follower)
-                .addPath(new Path(new BezierCurve(startPose, intakeEnd)))
-                .build();
-
-        PathChain toShoot = new PathBuilder(follower)
-                .addPath(new Path(new BezierCurve(intakeEnd, shootPose)))
-                .build();
 
         telemetry.addLine("Ready");
         telemetry.update();
-        waitForStart();
+        waitForStart(); // PRESS START queue geometry dash
 
-        // ===== START AUTO =====
-        robot.startIntake();           // start intake immediately
-        follower.followPath(intakePath); // drive straight while intaking
+        robot.setShooterRPM(TARGET_RPM); // Allows the shooter to be sped up before auto
+        stateTimer.reset();
 
         while (opModeIsActive()) {
-            follower.update();
+            follower.update(); // Updates follower position and must be called every loop
 
-            switch(currentState) {
+            switch (currentState) {
+
+                /* ---------- PRELOAD ---------- */
+
+                case PRELOAD_SPIN_UP:
+                    if (robot.shooterAtSpeed(RPM_TOLERANCE)) { // Waits until shooter is at speed
+                        robot.feedBall();
+                        stateTimer.reset(); // Allows the state timer to be used in other states
+                        currentState = AutoState.PRELOAD_FEED; //Switches state
+                    }
+                    break;
+
+                case PRELOAD_FEED:
+                    if (stateTimer.seconds() > FEED_TIME) { //Waits until feeder has been on long enough
+                        robot.resetFeeder(); // Stops feeder
+                        ballsShot++; // Counts ball
+
+                        if (ballsShot < 3) {
+                            currentState = AutoState.PRELOAD_SPIN_UP;
+                        } else {
+                            ballsShot = 0;
+                            buildNewCycle();
+                            robot.startIntake();
+                            follower.followPath(intakePath);
+                            currentState = AutoState.DRIVE_TO_INTAKE;
+                            //Begins driving once all balls have been shot and starts intake motors
+                        }
+                    }
+                    break;
+
+                /* ---------- INTAKE ---------- */
 
                 case DRIVE_TO_INTAKE:
-                    if (!follower.isBusy()) {  // finished intake line
+                    if (!follower.isBusy()) { // Path finished
                         robot.stopIntake();
-                        follower.followPath(toShoot); // drive to shooting position
-                        robot.setShooterRPM(TARGET_RPM); // spin up shooter while driving
+                        robot.setShooterRPM(TARGET_RPM); // Causes shooter to spin while it spins to the shooting position
+                        follower.followPath(shootPath);
                         currentState = AutoState.DRIVE_TO_SHOOT;
                     }
                     break;
 
                 case DRIVE_TO_SHOOT:
-                    if (!follower.isBusy()) { // arrived at shooting position
-                        stateTimer.reset();
+                    if (!follower.isBusy()) {
                         currentState = AutoState.SPIN_UP_SHOOTER;
-                    }
+                    } // Waits until robot arrives
                     break;
+
+                /* ---------- SHOOT ---------- */
 
                 case SPIN_UP_SHOOTER:
                     if (robot.shooterAtSpeed(RPM_TOLERANCE)) {
@@ -106,28 +134,49 @@ public class AutoMechanism extends LinearOpMode {
                         robot.resetFeeder();
                         ballsShot++;
 
-                        if (ballsShot < 3) { // number of balls to shoot
-                            stateTimer.reset();
+                        if (ballsShot < 3) {
                             currentState = AutoState.SPIN_UP_SHOOTER;
                         } else {
-                            robot.stopShooter();
+                            ballsShot = 0;
+                            cycleIndex++;
                             currentState = AutoState.DONE;
                         }
                     }
                     break;
 
+                /* ---------- LOOP ---------- */
+
                 case DONE:
-                    //  add parking code here
+                    if (cycleIndex < MAX_CYCLES) { // Checks if there are more cycles remaining
+                        buildNewCycle();
+                        robot.startIntake();
+                        follower.followPath(intakePath);
+                        currentState = AutoState.DRIVE_TO_INTAKE;
+                    } else {
+                        robot.stopShooter(); // Ends shooting
+                    }
                     break;
             }
 
-            // ===== TELEMETRY =====
             telemetry.addData("State", currentState);
-            telemetry.addData("Balls Shot", ballsShot);
-            telemetry.addData("Shooter RPM", robot.getShooterRPM());
-            telemetry.addData("Target RPM", TARGET_RPM);
+            telemetry.addData("Cycle", cycleIndex);
             telemetry.addData("Pose", follower.getPose());
             telemetry.update();
         }
+    }
+
+    /* ---------- PATH BUILDER ---------- */
+
+    private void buildNewCycle() { // Creates paths for the next cycle
+        Pose currentPose = follower.getPose(); // Uses the robot's currentpose
+        Pose intakePose = intakePoses[cycleIndex]; // selects the right intake target
+
+        intakePath = new PathBuilder(follower)
+                .addPath(new Path(new BezierCurve(currentPose, intakePose)))
+                .build(); // Builds the path to the intake
+
+        shootPath = new PathBuilder(follower)
+                .addPath(new Path(new BezierCurve(intakePose, shootPose)))
+                .build(); // Same as above but for shooter
     }
 }
